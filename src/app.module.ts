@@ -5,6 +5,8 @@ import { ProductosModule } from './modules/productos/productos.module';
 import { CarritoModule } from './modules/carrito/carrito.module';
 import { PedidosModule } from './modules/pedidos/pedidos.module';
 import { UsuariosModule } from './modules/usuarios/usuarios.module';
+import { UploadsModule } from './modules/uploads/uploads.module';
+import { CloudinaryModule } from './infrastructure/cloudinary/cloudinary.module';
 
 @Module({
   imports: [
@@ -12,6 +14,8 @@ import { UsuariosModule } from './modules/usuarios/usuarios.module';
       isGlobal: true,
       envFilePath: '.env',
     }),
+    CloudinaryModule,
+    UploadsModule,
     CategoriasModule,
     ProductosModule,
     CarritoModule,
