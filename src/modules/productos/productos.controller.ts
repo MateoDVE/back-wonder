@@ -8,15 +8,18 @@ import {
   Delete,
   Query,
   ParseIntPipe,
+  UseGuards,
 } from '@nestjs/common';
 import { ProductosService } from './productos.service';
 import { CreateProductoDto, UpdateProductoDto } from '../../application/dto';
+import { AdminGuard } from '../../infrastructure/guards';
 
 @Controller('productos')
 export class ProductosController {
   constructor(private readonly productosService: ProductosService) {}
 
   @Post()
+  @UseGuards(AdminGuard)
   create(@Body() createProductoDto: CreateProductoDto) {
     return this.productosService.create(createProductoDto);
   }
@@ -57,6 +60,7 @@ export class ProductosController {
   }
 
   @Put(':id')
+  @UseGuards(AdminGuard)
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateProductoDto: UpdateProductoDto,
@@ -65,6 +69,7 @@ export class ProductosController {
   }
 
   @Put(':id/stock')
+  @UseGuards(AdminGuard)
   updateStock(
     @Param('id', ParseIntPipe) id: number,
     @Body('cantidad', ParseIntPipe) cantidad: number,
@@ -73,11 +78,13 @@ export class ProductosController {
   }
 
   @Put(':id/toggle-destacado')
+  @UseGuards(AdminGuard)
   toggleDestacado(@Param('id', ParseIntPipe) id: number) {
     return this.productosService.toggleDestacado(id);
   }
 
   @Delete(':id')
+  @UseGuards(AdminGuard)
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.productosService.remove(id);
   }
