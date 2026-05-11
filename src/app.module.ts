@@ -5,6 +5,7 @@ import { ProductosModule } from './modules/productos/productos.module';
 import { CarritoModule } from './modules/carrito/carrito.module';
 import { PedidosModule } from './modules/pedidos/pedidos.module';
 import { UsuariosModule } from './modules/usuarios/usuarios.module';
+import { AuthModule } from './modules/auth/auth.module';
 import { UploadsModule } from './modules/uploads/uploads.module';
 import { CloudinaryModule } from './infrastructure/cloudinary/cloudinary.module';
 
@@ -21,6 +22,7 @@ import { CloudinaryModule } from './infrastructure/cloudinary/cloudinary.module'
     CarritoModule,
     PedidosModule,
     UsuariosModule,
+    AuthModule,
   ],
   controllers: [],
   providers: [],
