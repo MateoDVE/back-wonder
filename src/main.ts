@@ -10,8 +10,18 @@ async function bootstrap() {
     forbidNonWhitelisted: true,
     transform: true,
   }));
+
+  const allowedOrigins = [
+    'http://localhost:4200',
+    'http://localhost:3000',
+    ...(process.env.FRONTEND_URL ?? '')
+      .split(',')
+      .map((origin) => origin.trim())
+      .filter(Boolean),
+  ];
+
   app.enableCors({
-    origin: ['http://localhost:4200', 'http://localhost:3000'],
+    origin: Array.from(new Set(allowedOrigins)),
     credentials: true,
   });
 
