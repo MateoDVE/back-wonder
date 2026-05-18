@@ -17,14 +17,14 @@ export class CarritoController {
 
   @Post(':usuarioId')
   agregarItem(
-    @Param('usuarioId', ParseIntPipe) usuarioId: number,
+    @Param('usuarioId') usuarioId: string,
     @Body() agregarItemDto: AgregarItemCarritoDto,
   ) {
     return this.carritoService.agregarItem(usuarioId, agregarItemDto);
   }
 
   @Get(':usuarioId')
-  obtenerCarrito(@Param('usuarioId', ParseIntPipe) usuarioId: number) {
+  obtenerCarrito(@Param('usuarioId') usuarioId: string) {
     return this.carritoService.obtenerCarrito(usuarioId);
   }
 
@@ -47,7 +47,7 @@ export class CarritoController {
   }
 
   @Delete(':usuarioId')
-  vaciarCarrito(@Param('usuarioId', ParseIntPipe) usuarioId: number) {
+  vaciarCarrito(@Param('usuarioId') usuarioId: string) {
     return this.carritoService.vaciarCarrito(usuarioId);
   }
 }

@@ -1,9 +1,10 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { ValidationPipe } from '@nestjs/common';
+import { Logger, ValidationPipe } from '@nestjs/common';
 import { UsuariosService } from './modules/usuarios/usuarios.service';
 
 async function bootstrap() {
+  const logger = new Logger('Bootstrap');
   const app = await NestFactory.create(AppModule);
   app.useGlobalPipes(new ValidationPipe({
     whitelist: true,
@@ -26,7 +27,12 @@ async function bootstrap() {
   });
 
   const usuariosService = app.get(UsuariosService);
-  await usuariosService.ensureInitialAdminUser();
+  try {
+    await usuariosService.ensureInitialAdminUser();
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    logger.warn(`No se pudo inicializar el usuario admin al arrancar. El servidor continuará iniciando. ${message}`);
+  }
 
   await app.listen(process.env.PORT ?? 3000);
 }

@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Post, ParseIntPipe, Body, Query, Put, Delete } from '@nestjs/common';
+import { Controller, Get, Param, Post, Body, Query, Put, Delete } from '@nestjs/common';
 import { UsuariosService } from './usuarios.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -20,7 +20,14 @@ export class UsuariosController {
   }
 
   @Get(':id/existe')
-  async existe(@Param('id', ParseIntPipe) id: number) {
+  async existe(@Param('id') id: string) {
+    if (!id || id === 'undefined' || id === 'null') {
+      return { existe: false };
+    }
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(id)) {
+      return { existe: false };
+    }
     const usuario = await this.usuariosService.findById(id);
     return { existe: !!usuario };
   }
@@ -39,19 +46,20 @@ export class UsuariosController {
   }
 
   @Get(':id')
-  async findOne(@Param('id', ParseIntPipe) id: number) {
+  async findOne(@Param('id') id: string) {
     const u = await this.usuariosService.findById(id);
     if (!u) return { error: 'Not found' };
     return u;
   }
 
   @Put(':id')
-  async update(@Param('id', ParseIntPipe) id: number, @Body() updateUserDto: UpdateUserDto) {
+  async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.usuariosService.update(id, updateUserDto);
   }
 
   @Delete(':id')
-  async remove(@Param('id', ParseIntPipe) id: number) {
+  async remove(@Param('id') id: string) {
     return this.usuariosService.remove(id);
   }
+
 }

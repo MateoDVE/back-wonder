@@ -21,7 +21,7 @@ export class CarritoService {
     private readonly vaciarCarritoUseCase: VaciarCarritoUseCase,
   ) {}
 
-  async agregarItem(usuarioId: number, dto: AgregarItemCarritoDto): Promise<CarritoItem> {
+  async agregarItem(usuarioId: string, dto: AgregarItemCarritoDto): Promise<CarritoItem> {
     return await this.agregarItemAlCarritoUseCase.execute({
       usuario_id: usuarioId,
       producto_id: dto.producto_id,
@@ -30,7 +30,7 @@ export class CarritoService {
     });
   }
 
-  async obtenerCarrito(usuarioId: number): Promise<CarritoItem[]> {
+  async obtenerCarrito(usuarioId: string): Promise<CarritoItem[]> {
     return await this.obtenerCarritoDeUsuarioUseCase.execute(usuarioId);
   }
 
@@ -46,7 +46,7 @@ export class CarritoService {
     return await this.eliminarItemDelCarritoUseCase.execute(id);
   }
 
-  async vaciarCarrito(usuarioId: number): Promise<void> {
+  async vaciarCarrito(usuarioId: string): Promise<void> {
     return await this.vaciarCarritoUseCase.execute(usuarioId);
   }
 }

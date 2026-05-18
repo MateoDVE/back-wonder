@@ -4,7 +4,7 @@ import type { CarritoRepositoryPort } from '../ports/carrito.repository.port';
 import { CARRITO_REPOSITORY } from '../ports/carrito.repository.port';
 
 export interface AgregarItemInput {
-  usuario_id: number;
+  usuario_id: string;
   producto_id: number;
   cantidad: number;
   precio_unitario: number;
@@ -52,7 +52,7 @@ export class ObtenerCarritoDeUsuarioUseCase {
     private readonly carritoRepository: CarritoRepositoryPort,
   ) {}
 
-  async execute(usuarioId: number): Promise<CarritoItem[]> {
+  async execute(usuarioId: string): Promise<CarritoItem[]> {
     return await this.carritoRepository.findByUsuario(usuarioId);
   }
 }
@@ -122,7 +122,7 @@ export class VaciarCarritoUseCase {
     private readonly carritoRepository: CarritoRepositoryPort,
   ) {}
 
-  async execute(usuarioId: number): Promise<void> {
+  async execute(usuarioId: string): Promise<void> {
     await this.carritoRepository.vaciarCarrito(usuarioId);
   }
 }

@@ -1,7 +1,7 @@
 export class CarritoItem {
   id: number;
 
-  usuario_id: number;
+  usuario_id: string;
 
   producto_id: number;
 
