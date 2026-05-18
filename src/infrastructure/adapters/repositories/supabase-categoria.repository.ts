@@ -3,6 +3,11 @@ import { supabase } from '../../supabase/supabase.client';
 import { Categoria } from '../../../domain/entities/categoria.entity';
 import { CategoriaRepositoryPort } from '../../../domain/ports/categoria.repository.port';
 
+function isSupabaseUnavailable(error: unknown): boolean {
+  const message = error instanceof Error ? error.message : String(error);
+  return /fetch failed|ENOTFOUND|ECONNREFUSED|network/i.test(message);
+}
+
 @Injectable()
 export class SupabaseCategoriaRepository implements CategoriaRepositoryPort {
   async create(
@@ -22,33 +27,47 @@ export class SupabaseCategoriaRepository implements CategoriaRepositoryPort {
   }
 
   async findAll(activa?: boolean): Promise<Categoria[]> {
-    let query = supabase.from('categorias').select('*');
+    try {
+      let query = supabase.from('categorias').select('*');
 
-    if (activa !== undefined) {
-      query = query.eq('activa', activa);
+      if (activa !== undefined) {
+        query = query.eq('activa', activa);
+      }
+
+      const { data, error } = await query.order('nombre', { ascending: true });
+
+      if (error) {
+        throw new Error(`Error obteniendo categorías: ${error.message}`);
+      }
+
+      return data || [];
+    } catch (error) {
+      if (isSupabaseUnavailable(error)) {
+        return [];
+      }
+      throw error;
     }
-
-    const { data, error } = await query.order('nombre', { ascending: true });
-
-    if (error) {
-      throw new Error(`Error obteniendo categorías: ${error.message}`);
-    }
-
-    return data || [];
   }
 
   async findOne(id: number): Promise<Categoria | null> {
-    const { data, error } = await supabase
-      .from('categorias')
-      .select('*')
-      .eq('id', id)
-      .single();
+    try {
+      const { data, error } = await supabase
+        .from('categorias')
+        .select('*')
+        .eq('id', id)
+        .single();
 
-    if (error && error.code !== 'PGRST116') {
-      throw new Error(`Error obteniendo categoría: ${error.message}`);
+      if (error && error.code !== 'PGRST116') {
+        throw new Error(`Error obteniendo categoría: ${error.message}`);
+      }
+
+      return data || null;
+    } catch (error) {
+      if (isSupabaseUnavailable(error)) {
+        return null;
+      }
+      throw error;
     }
-
-    return data || null;
   }
 
   async findByName(nombre: string): Promise<Categoria | null> {

@@ -1,47 +1,103 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
-import * as bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-import { UsuariosService } from '../usuarios/usuarios.service';
+import { Injectable, UnauthorizedException, BadRequestException, Logger } from '@nestjs/common';
+import { supabase } from '../../infrastructure/supabase/supabase.client';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly usuariosService: UsuariosService) {}
+  private readonly logger = new Logger(AuthService.name);
 
   async login(email: string, password: string) {
-    const user = await this.usuariosService.findByEmail(email);
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
 
-    if (!user) {
+    if (error) {
+      this.logger.error(`Login error: ${error.message}`);
       throw new UnauthorizedException('Credenciales inválidas');
     }
 
-    if (user.activo === false) {
+    if (!data.user) {
+      throw new UnauthorizedException('Credenciales inválidas');
+    }
+
+    this.logger.debug(`User logged in: ${data.user.id}`);
+
+    // Obtener datos adicionales del perfil
+    const { data: userProfile, error: profileError } = await supabase
+      .from('usuarios')
+      .select('nombre, apellido, rol, activo')
+      .eq('id', data.user.id)
+      .single();
+
+    this.logger.debug(`Profile query for ${data.user.id}: ${JSON.stringify({ data: userProfile, error: profileError })}`);
+
+    if (profileError && profileError.code !== 'PGRST116') {
+      this.logger.error(`Profile fetch error: ${profileError.message}`);
+    }
+
+    if (userProfile?.activo === false) {
       throw new UnauthorizedException('Usuario inactivo');
     }
 
-    const isValidPassword = await bcrypt.compare(password, user.password_hash);
-    if (!isValidPassword) {
-      throw new UnauthorizedException('Credenciales inválidas');
-    }
+    const user = {
+      id: data.user.id,
+      email: data.user.email,
+      nombre: userProfile?.nombre || '',
+      apellido: userProfile?.apellido || '',
+      rol: userProfile?.rol || 'cliente',
+    };
 
-    const secret = process.env.JWT_SECRET || 'wonder-dev-secret-change-me';
-    const accessToken = jwt.sign(
-      {
-        sub: user.id,
-        email: user.email,
-        rol: user.rol,
-      },
-      secret,
-      { expiresIn: '7d' },
-    );
+    this.logger.debug(`User object: ${JSON.stringify(user)}`);
 
     return {
-      accessToken,
+      accessToken: data.session?.access_token,
+      refreshToken: data.session?.refresh_token,
+      user,
+    };
+  }
+
+  async signup(email: string, password: string) {
+    // Create user in Supabase Auth
+    const { data: authData, error: authError } = await supabase.auth.signUp({
+      email,
+      password,
+    });
+
+    if (authError) {
+      if (authError.message.includes('already exists')) {
+        throw new BadRequestException('Email already registered');
+      }
+      throw new BadRequestException(authError.message);
+    }
+
+    if (!authData.user) {
+      throw new BadRequestException('Error creating user');
+    }
+
+    // Create user profile in database
+    const { error: dbError } = await supabase
+      .from('usuarios')
+      .insert({
+        id: authData.user.id,
+        email,
+        nombre: '',
+        apellido: '',
+        rol: 'cliente',
+        activo: true,
+        verificado: false,
+      });
+
+    if (dbError) {
+      // Clean up auth user if profile creation fails
+      await supabase.auth.admin.deleteUser(authData.user.id);
+      throw new BadRequestException(dbError.message);
+    }
+
+    return {
+      message: 'User created successfully. Check your email to verify your account.',
       user: {
-        id: user.id,
-        email: user.email,
-        nombre: user.nombre,
-        apellido: user.apellido,
-        rol: user.rol,
+        id: authData.user.id,
+        email: authData.user.email,
       },
     };
   }

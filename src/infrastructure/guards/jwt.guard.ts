@@ -4,11 +4,11 @@ import {
   ExecutionContext,
   UnauthorizedException,
 } from '@nestjs/common';
-import * as jwt from 'jsonwebtoken';
+import { supabase } from '../supabase/supabase.client';
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
-  canActivate(context: ExecutionContext): boolean {
+  async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
     const authHeader = request.headers.authorization;
 
@@ -22,12 +22,19 @@ export class JwtAuthGuard implements CanActivate {
     }
 
     try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET || 'dev-secret') as unknown as {
-        sub: number;
-        email: string;
-        rol: string;
+      // Verify token with Supabase
+      const { data, error } = await supabase.auth.getUser(token);
+
+      if (error || !data.user) {
+        throw new UnauthorizedException('Invalid or expired token');
+      }
+
+      // Attach user to request
+      request.user = {
+        id: data.user.id,
+        email: data.user.email,
       };
-      request.user = decoded;
+
       return true;
     } catch (error) {
       throw new UnauthorizedException('Invalid or expired token');
