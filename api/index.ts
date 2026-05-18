@@ -36,9 +36,13 @@ async function bootstrap() {
   });
 
   const usuariosService = app.get(UsuariosService);
-  await usuariosService.ensureInitialAdminUser();
 
   await app.init();
+
+  if (process.env.VERCEL !== '1') {
+    void usuariosService.ensureInitialAdminUser().catch(() => undefined);
+  }
+
   return serverless(server);
 }
 
