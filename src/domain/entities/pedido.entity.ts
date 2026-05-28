@@ -1,6 +1,6 @@
 export class Pedido {
   id: number;
-  usuario_id: number;
+  usuario_id: string;
   total: number;
   estado: 'pendiente' | 'confirmado' | 'enviado' | 'entregado' | 'cancelado';
   notas?: string;

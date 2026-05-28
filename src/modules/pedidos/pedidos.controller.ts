@@ -26,7 +26,7 @@ export class PedidosController {
 
   @Get('usuario/:usuarioId')
   async obtenerPedidosDeUsuario(
-    @Param('usuarioId', ParseIntPipe) usuarioId: number,
+    @Param('usuarioId') usuarioId: string,
   ) {
     return await this.pedidosService.obtenerPedidosDeUsuario(usuarioId);
   }
