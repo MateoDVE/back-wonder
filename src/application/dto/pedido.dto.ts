@@ -15,8 +15,8 @@ export class CrearPedidoItemDto {
 }
 
 export class CrearPedidoDto {
-  @IsNumber()
-  usuario_id: number;
+  @IsString()
+  usuario_id: string;
 
   @IsNumber()
   @Min(0)
