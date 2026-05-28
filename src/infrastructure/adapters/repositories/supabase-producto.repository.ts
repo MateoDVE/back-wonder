@@ -135,17 +135,21 @@ export class SupabaseProductoRepository implements ProductoRepositoryPort {
   }
 
   async update(id: number, producto: Partial<Producto>): Promise<Producto> {
+    const cleanPayload = JSON.parse(JSON.stringify(producto));
+    console.log(`[SupabaseProductoRepository] Updating product ID: ${id} with clean payload:`, cleanPayload);
     const { data, error } = await supabase
       .from('productos')
-      .update(producto)
+      .update(cleanPayload)
       .eq('id', id)
       .select()
       .single();
 
     if (error) {
+      console.error(`[SupabaseProductoRepository] Error payload was:`, error);
       throw new Error(`Error actualizando producto: ${error.message}`);
     }
 
+    console.log(`[SupabaseProductoRepository] Update success for ID ${id}:`, data);
     return data;
   }
 
