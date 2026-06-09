@@ -16,7 +16,7 @@ export class SupabaseProductoRepository implements ProductoRepositoryPort {
     const { data, error } = await supabase
       .from('productos')
       .insert([producto])
-      .select()
+      .select('*, categoria:categorias(id, nombre, imagen_url, activa)')
       .single();
 
     if (error) {
@@ -33,7 +33,7 @@ export class SupabaseProductoRepository implements ProductoRepositoryPort {
     search?: string;
   }): Promise<Producto[]> {
     try {
-      let query = supabase.from('productos').select('*');
+      let query = supabase.from('productos').select('*, categoria:categorias(id, nombre, imagen_url, activa)');
 
       if (filters?.categoriaId) {
         query = query.eq('categoria_id', filters.categoriaId);
@@ -72,7 +72,7 @@ export class SupabaseProductoRepository implements ProductoRepositoryPort {
     try {
       const { data, error } = await supabase
         .from('productos')
-        .select('*')
+        .select('*, categoria:categorias(id, nombre, imagen_url, activa)')
         .eq('id', id)
         .single();
 
@@ -93,7 +93,7 @@ export class SupabaseProductoRepository implements ProductoRepositoryPort {
     try {
       const { data, error } = await supabase
         .from('productos')
-        .select('*')
+        .select('*, categoria:categorias(id, nombre, imagen_url, activa)')
         .eq('categoria_id', categoriaId)
         .eq('activo', true)
         .order('nombre', { ascending: true });
@@ -115,7 +115,7 @@ export class SupabaseProductoRepository implements ProductoRepositoryPort {
     try {
       const { data, error } = await supabase
         .from('productos')
-        .select('*')
+        .select('*, categoria:categorias(id, nombre, imagen_url, activa)')
         .eq('destacado', true)
         .eq('activo', true)
         .order('created_at', { ascending: false })
@@ -141,7 +141,7 @@ export class SupabaseProductoRepository implements ProductoRepositoryPort {
       .from('productos')
       .update(cleanPayload)
       .eq('id', id)
-      .select()
+      .select('*, categoria:categorias(id, nombre, imagen_url, activa)')
       .single();
 
     if (error) {
@@ -174,7 +174,7 @@ export class SupabaseProductoRepository implements ProductoRepositoryPort {
       .from('productos')
       .update({ stock: current.stock + cantidad })
       .eq('id', id)
-      .select()
+      .select('*, categoria:categorias(id, nombre, imagen_url, activa)')
       .single();
 
     if (error) {
@@ -194,7 +194,7 @@ export class SupabaseProductoRepository implements ProductoRepositoryPort {
       .from('productos')
       .update({ destacado: !current.destacado })
       .eq('id', id)
-      .select()
+      .select('*, categoria:categorias(id, nombre, imagen_url, activa)')
       .single();
 
     if (error) {

@@ -1,12 +1,12 @@
 import { Injectable, UnauthorizedException, BadRequestException, Logger } from '@nestjs/common';
-import { supabase } from '../../infrastructure/supabase/supabase.client';
+import { supabase, supabaseAuth } from '../../infrastructure/supabase/supabase.client';
 
 @Injectable()
 export class AuthService {
   private readonly logger = new Logger(AuthService.name);
 
   async login(email: string, password: string) {
-    const { data, error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabaseAuth.auth.signInWithPassword({
       email,
       password,
     });
@@ -58,7 +58,7 @@ export class AuthService {
 
   async signup(email: string, password: string) {
     // Create user in Supabase Auth
-    const { data: authData, error: authError } = await supabase.auth.signUp({
+    const { data: authData, error: authError } = await supabaseAuth.auth.signUp({
       email,
       password,
     });
@@ -89,7 +89,7 @@ export class AuthService {
 
     if (dbError) {
       // Clean up auth user if profile creation fails
-      await supabase.auth.admin.deleteUser(authData.user.id);
+      await supabaseAuth.auth.admin.deleteUser(authData.user.id);
       throw new BadRequestException(dbError.message);
     }
 
