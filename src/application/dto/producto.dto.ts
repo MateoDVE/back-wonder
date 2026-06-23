@@ -21,7 +21,7 @@ export class CreateProductoDto {
   categoria_id: number;
 
   @IsOptional()
-  @IsDecimal({ decimal_digits: '2' })
+  @IsNumber()
   precio_costo?: number;
 
   @IsNumber()
@@ -41,7 +41,7 @@ export class CreateProductoDto {
   marca?: string;
 
   @IsOptional()
-  @IsDecimal({ decimal_digits: '2' })
+  @IsNumber()
   gradacion_alcoholica?: number;
 
   @IsOptional()
@@ -87,7 +87,7 @@ export class UpdateProductoDto {
   categoria_id?: number;
 
   @IsOptional()
-  @IsDecimal({ decimal_digits: '2' })
+  @IsNumber()
   precio_costo?: number;
 
   @IsOptional()
@@ -108,7 +108,7 @@ export class UpdateProductoDto {
   marca?: string;
 
   @IsOptional()
-  @IsDecimal({ decimal_digits: '2' })
+  @IsNumber()
   gradacion_alcoholica?: number;
 
   @IsOptional()
