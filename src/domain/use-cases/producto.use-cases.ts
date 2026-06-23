@@ -68,7 +68,6 @@ export class CrearProductoUseCase {
       gradacion_alcoholica: input.gradacion_alcoholica || null,
       volumen_ml: input.volumen_ml || null,
       tipo_bebida: input.tipo_bebida || null,
-      pais_origen: input.pais_origen || null,
       imagen_url: input.imagen_url || null,
       imagenes_adicionales: input.imagenes_adicionales || null,
       activo: input.activo ?? true,
