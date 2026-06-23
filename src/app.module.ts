@@ -8,6 +8,7 @@ import { UsuariosModule } from './modules/usuarios/usuarios.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { UploadsModule } from './modules/uploads/uploads.module';
 import { CloudinaryModule } from './infrastructure/cloudinary/cloudinary.module';
+import { CarruselModule } from './modules/carrusel/carrusel.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { CloudinaryModule } from './infrastructure/cloudinary/cloudinary.module'
     PedidosModule,
     UsuariosModule,
     AuthModule,
+    CarruselModule,
   ],
   controllers: [],
   providers: [],
